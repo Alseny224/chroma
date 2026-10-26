@@ -174,7 +174,6 @@ chroma/
 │       └── state.ts          État du générateur et lien partageable
 ├── .github/                  CI et modèles d'issues / de pull request
 ├── docs/                     Captures d'écran du README
-├── source/                   Maquette d'origine (référence de design)
 ├── README.md
 ├── CONTRIBUTING.md
 ├── ROADMAP.md

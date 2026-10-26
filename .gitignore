@@ -1,4 +1,4 @@
-# Archive d'origine (son contenu est extrait dans source/)
+# Archive de la maquette d'origine, gardée en local
 *.zip
 node_modules/
 dist/
