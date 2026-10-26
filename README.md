@@ -19,6 +19,7 @@ Tout tourne dans le navigateur : aucune couleur n'est envoyée à un serveur.
 - [Structure du projet](#structure-du-projet)
 - [Limites connues](#limites-connues)
 - [Contribuer](#contribuer)
+- [Licence](#licence)
 
 ## Ce que Chroma génère
 
@@ -176,7 +177,8 @@ chroma/
 ├── source/                   Maquette d'origine (référence de design)
 ├── README.md
 ├── CONTRIBUTING.md
-└── ROADMAP.md
+├── ROADMAP.md
+└── LICENSE
 ```
 
 ## Limites connues
@@ -189,3 +191,9 @@ chroma/
 ## Contribuer
 
 Les contributions sont les bienvenues : voir [CONTRIBUTING.md](CONTRIBUTING.md). Les chantiers prévus sont listés dans [ROADMAP.md](ROADMAP.md).
+
+## Licence
+
+Le code de Chroma est publié sous licence [MIT](LICENSE) © 2026 vectorX64. Cela couvre aussi les fichiers du kit que l'export copie dans ton projet (`components.css`, `ui.tsx`…) : tu peux les utiliser, les modifier et les distribuer, y compris dans un projet commercial ou fermé.
+
+**Les thèmes que tu génères t'appartiennent**, sans condition : couleurs, variables et tokens peuvent être utilisés librement, sans mention ni attribution.

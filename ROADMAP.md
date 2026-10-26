@@ -29,12 +29,12 @@ Les chantiers prévus pour Chroma, classés par type. Chaque entrée est rédig�
 | 14 | Bibliothèque de sections et starter kit | Fonctionnalité | P2 | ⬜ |
 | 15 | Transmettre le mode clair/sombre de la démo au générateur | Fonctionnalité | P3 | ⬜ |
 | 16 | Interface en anglais | Fonctionnalité | P3 | ⬜ |
-| 17 | Ajouter une licence | Projet | P1 | ⬜ |
+| 17 | Ajouter une licence | Projet | P1 | ✅ |
 | 18 | CI GitHub Actions | Projet | P1 | ✅ |
 | 19 | Vérifier Safari et Firefox | Projet | P2 | ⬜ |
 | 20 | Modèles d'issues et de pull request | Projet | P3 | ✅ |
 
-**Ordre conseillé** : #17, puis #7 et #4 (les filets de sécurité), puis #11, la fonctionnalité qui manque le plus pour de vrais projets.
+**Ordre conseillé** : #7 et #4 (les filets de sécurité), puis #11, la fonctionnalité qui manque le plus pour de vrais projets.
 
 ---
 
@@ -150,9 +150,9 @@ Le site et la documentation n'existent qu'en français, ce qui limite l'audience
 
 ## Projet
 
-### 17. Ajouter une licence — P1
+### 17. Ajouter une licence — P1 ✅
 
-Sans fichier `LICENSE`, personne n'a le droit légal de réutiliser le code ni d'y contribuer. À mentionner ensuite dans le README et le CONTRIBUTING.
+Licence MIT © 2026 vectorX64 (`LICENSE`), mentionnée dans le README et le CONTRIBUTING. Le README précise que les thèmes générés appartiennent à l'utilisateur.
 
 ### 18. CI GitHub Actions — P1 ✅
 

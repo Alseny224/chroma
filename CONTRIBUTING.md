@@ -1,6 +1,8 @@
 # Contribuer à Chroma
 
-Merci de vouloir améliorer Chroma ! Ce guide explique comment installer le projet, ce qu'il faut vérifier avant de proposer une modification, et comment ajouter les éléments les plus courants : une ambiance, une police, un format d'export, un composant.
+Merci de vouloir améliorer Chroma ! En proposant une contribution, tu acceptes qu'elle soit publiée sous la [licence MIT](LICENSE) du projet.
+
+Ce guide explique comment installer le projet, ce qu'il faut vérifier avant de proposer une modification, et comment ajouter les éléments les plus courants : une ambiance, une police, un format d'export, un composant.
 
 ## Sommaire
 
