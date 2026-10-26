@@ -1,0 +1,21 @@
+name: Proposer une fonctionnalité
+description: Une idée pour que Chroma fasse gagner encore plus de temps.
+labels: [fonctionnalité]
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Quel besoin ?
+      description: Le problème que tu rencontres aujourd'hui, dans quel projet ou quelle stack.
+    validations:
+      required: true
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Ce que tu proposes
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Ce que tu fais aujourd'hui à la place

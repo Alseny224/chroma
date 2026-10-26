@@ -1,0 +1,40 @@
+name: Signaler un bug
+description: Quelque chose ne fonctionne pas comme prévu.
+labels: [bug]
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Que s'est-il passé ?
+      description: Ce que tu as fait, ce que tu attendais, et ce qui s'est passé.
+    validations:
+      required: true
+  - type: input
+    id: lien
+    attributes:
+      label: Lien partageable du thème
+      description: Bouton « Copier le lien » du générateur. Il permet de reproduire le thème exact.
+      placeholder: https://…/generateur.html?seed=%23059669&mood=tech
+  - type: dropdown
+    id: zone
+    attributes:
+      label: Où ?
+      options:
+        - Générateur
+        - Landing page
+        - Un export (CSS, Tailwind, shadcn/ui, Figma, composants)
+        - Contrastes / accessibilité
+    validations:
+      required: true
+  - type: input
+    id: environnement
+    attributes:
+      label: Navigateur, système et largeur d'écran
+      placeholder: Safari 18, iOS 18, 390 px
+    validations:
+      required: true
+  - type: textarea
+    id: captures
+    attributes:
+      label: Captures ou extrait de l'export
+      description: Pour un problème de contraste, indique la paire et le ratio affichés dans « Contrastes WCAG ».
