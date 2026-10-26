@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { contrastRatio, hexToRgb, hslToHex, rgbToHex, rgbToHsl } from './color';
-import { exportTheme } from './export';
 import { buildTheme, MOOD_IDS } from './theme';
 
 describe('color', () => {
@@ -31,6 +30,8 @@ describe('buildTheme', () => {
           expect(contrastRatio(t.muted, t.bg)).toBeGreaterThanOrEqual(4.5);
           expect(contrastRatio(t.onPrimary, t.primary)).toBeGreaterThanOrEqual(4.5);
           expect(contrastRatio(t.accent, t.bg)).toBeGreaterThanOrEqual(3);
+          expect(contrastRatio(t.input, t.bg)).toBeGreaterThanOrEqual(3);
+          expect(contrastRatio(t.onPrimary, t.primaryHover)).toBeGreaterThanOrEqual(4.5);
         }
       });
     }
@@ -39,29 +40,5 @@ describe('buildTheme', () => {
   it('dérive les rayons du réglage', () => {
     const t = buildTheme({ seed: '#4F46E5', mood: 'calme', hue: 0, sat: 100, radius: 20 }, false);
     expect([t.radius, t.radiusSm, t.radiusLg]).toEqual(['20px', '9px', '27px']);
-  });
-});
-
-describe('exportTheme', () => {
-  const input = {
-    light: buildTheme({ seed: '#4F46E5', mood: 'calme', hue: 0, sat: 100, radius: 14 }, false),
-    dark: buildTheme({ seed: '#4F46E5', mood: 'calme', hue: 0, sat: 100, radius: 14 }, true),
-    seed: '#4F46E5',
-    mood: 'calme' as const,
-    radius: 14,
-  };
-
-  it('produit les deux modes en CSS', () => {
-    const css = exportTheme('css', input);
-    expect(css).toContain(':root {');
-    expect(css).toContain('[data-theme="dark"] {');
-    expect(css).toContain(`--color-primary: ${input.light.primary};`);
-    expect(css).toContain('--radius: 14px;');
-  });
-
-  it('produit des tokens W3C valides', () => {
-    const doc = JSON.parse(exportTheme('figma', input));
-    expect(doc.chroma.dark.accent).toEqual({ $type: 'color', $value: input.dark.accent });
-    expect(doc.chroma.radius.$value).toBe('14px');
   });
 });

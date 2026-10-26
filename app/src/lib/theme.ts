@@ -1,4 +1,8 @@
 import { fitContrast, hexToRgb, hslToHex, mix, rgbToHsl } from './color';
+import { FONT_PAIRS, type FontPairId } from './fonts';
+
+export type ScaleId = 'compacte' | 'equilibree' | 'expressive';
+export type DensityId = 'compacte' | 'normale' | 'aeree';
 
 export type MoodId = 'calme' | 'vif' | 'luxe' | 'tech' | 'naturel';
 
@@ -15,8 +19,10 @@ export interface Mood {
   fixed: number | null;
   accSat: number;
   radius: number;
-  head: string;
-  body: string;
+  /** Valeurs par défaut du système de design pour cette ambiance. */
+  fonts: FontPairId;
+  scale: ScaleId;
+  density: DensityId;
 }
 
 export const MOODS: Record<MoodId, Mood> = {
@@ -24,31 +30,31 @@ export const MOODS: Record<MoodId, Mood> = {
     label: 'Calme',
     desc: 'Couleurs adoucies, accent voisin, formes rondes. Idéal pour le bien-être, l’éducation, les services.',
     sat: 0.7, tint: 1, off: 35, fixed: null, accSat: 0.85, radius: 14,
-    head: "'Space Grotesk', sans-serif", body: "'Inter', sans-serif",
+    fonts: 'moderne', scale: 'equilibree', density: 'normale',
   },
   vif: {
     label: 'Vif',
     desc: 'Saturation poussée et accent complémentaire. Pour les marques jeunes, l’événementiel, le divertissement.',
     sat: 1.2, tint: 1.3, off: 170, fixed: null, accSat: 1.1, radius: 10,
-    head: "'Space Grotesk', sans-serif", body: "'Inter', sans-serif",
+    fonts: 'moderne', scale: 'expressive', density: 'normale',
   },
   luxe: {
     label: 'Luxe',
     desc: 'Neutres profonds, saturation retenue, accent doré et angles nets. Pour la mode, l’hôtellerie, l’artisanat haut de gamme.',
     sat: 0.45, tint: 0.5, off: 0, fixed: 40, accSat: 1.4, radius: 2,
-    head: "'Fraunces', Georgia, serif", body: "'Inter', sans-serif",
+    fonts: 'editorial', scale: 'expressive', density: 'aeree',
   },
   tech: {
     label: 'Tech',
     desc: 'Contraste franc, accent froid, titres en monospace. Pour les SaaS, les outils de dev, les dashboards.',
     sat: 1, tint: 0.8, off: -150, fixed: null, accSat: 1, radius: 6,
-    head: "'JetBrains Mono', monospace", body: "'Inter', sans-serif",
+    fonts: 'technique', scale: 'compacte', density: 'compacte',
   },
   naturel: {
     label: 'Naturel',
     desc: 'Tons terreux, accent analogue, courbes généreuses. Pour l’alimentation, le jardin, la slow-fashion.',
     sat: 0.55, tint: 1.1, off: -45, fixed: null, accSat: 0.8, radius: 20,
-    head: "'Fraunces', Georgia, serif", body: "'Inter', sans-serif",
+    fonts: 'editorial', scale: 'equilibree', density: 'aeree',
   },
 };
 
@@ -63,6 +69,8 @@ export interface ThemeInput {
   sat: number;
   /** Rayon de base en px. */
   radius: number;
+  /** Paire de polices ; par défaut celle de l'ambiance. */
+  fonts?: FontPairId;
 }
 
 export interface Theme {
@@ -76,11 +84,16 @@ export interface Theme {
   accent: string;
   primarySoft: string;
   accentSoft: string;
+  /** Primaire au survol, contraste avec onPrimary conservé. */
+  primaryHover: string;
+  /** Bordure des champs : 3:1 contre le fond (WCAG 1.4.11). */
+  input: string;
   radius: string;
   radiusSm: string;
   radiusLg: string;
   head: string;
   body: string;
+  mono: string;
   dark: boolean;
 }
 
@@ -94,7 +107,7 @@ export function buildTheme(input: ThemeInput, dark: boolean): Theme {
   const accS = Math.min(1, Math.max(0.3, s * M.accSat)) * Math.min(1, input.sat / 100 + 0.2);
 
   let bg: string, surface: string, border: string, text: string, muted: string;
-  let primary: string, onPrimary: string, accent: string;
+  let primary: string, onPrimary: string, accent: string, inputBorder: string;
 
   if (!dark) {
     bg = hslToHex(h, ns * 0.6, 0.985);
@@ -116,6 +129,7 @@ export function buildTheme(input: ThemeInput, dark: boolean): Theme {
       onPrimary = '#FFFFFF';
     }
     accent = fitContrast(accH, accS, 0.52, bg, 3.1, -1)[0];
+    inputBorder = fitContrast(h, ns * 0.6, 0.72, bg, 3.1, -1)[0];
   } else {
     bg = hslToHex(h, ns * 0.8, 0.08);
     surface = hslToHex(h, ns * 0.8, 0.12);
@@ -125,18 +139,26 @@ export function buildTheme(input: ThemeInput, dark: boolean): Theme {
     onPrimary = hslToHex(h, ns * 0.8, 0.08);
     primary = fitContrast(h, s, Math.max(l, 0.6), onPrimary, 4.6, 1)[0];
     accent = fitContrast(accH, accS, 0.62, bg, 3.1, 1)[0];
+    inputBorder = fitContrast(h, ns * 0.5, 0.36, bg, 3.1, 1)[0];
   }
+
+  // Au survol, on s'éloigne de la couleur du libellé pour garder le contraste.
+  const primaryHover = onPrimary === '#FFFFFF' ? mix(primary, text, 0.85) : mix(primary, '#FFFFFF', 0.82);
+  const fonts = FONT_PAIRS[input.fonts ?? M.fonts];
 
   const r = input.radius;
   return {
     bg, surface, border, text, muted, primary, onPrimary, accent,
     primarySoft: mix(primary, bg, dark ? 0.22 : 0.12),
     accentSoft: mix(accent, bg, dark ? 0.26 : 0.18),
+    primaryHover,
+    input: inputBorder,
     radius: `${r}px`,
     radiusSm: `${Math.max(2, Math.round(r * 0.45))}px`,
     radiusLg: `${Math.round(r * 1.35)}px`,
-    head: M.head,
-    body: M.body,
+    head: fonts.heading,
+    body: fonts.body,
+    mono: fonts.mono,
     dark,
   };
 }

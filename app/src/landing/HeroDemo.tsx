@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { PRESETS } from '../data';
 import { contrastChecks } from '../lib/checks';
+import type { StateColor, StateId } from '../lib/system';
 import { MOOD_IDS, MOODS, themeVars, type MoodId, type Theme } from '../lib/theme';
 import { generatorUrl } from './links';
 
@@ -9,6 +10,7 @@ interface Props {
   mood: MoodId;
   dark: boolean;
   theme: Theme;
+  states: Record<StateId, StateColor>;
   onSeed: (hex: string) => void;
   onMood: (mood: MoodId) => void;
   onDark: (dark: boolean) => void;
@@ -17,8 +19,8 @@ interface Props {
 const BARS = [38, 52, 46, 64, 58, 76, 88];
 
 /** Mini-générateur interactif affiché dans le hero. */
-export function HeroDemo({ seed, mood, dark, theme: t, onSeed, onMood, onDark }: Props) {
-  const checks = contrastChecks(t);
+export function HeroDemo({ seed, mood, dark, theme: t, states, onSeed, onMood, onDark }: Props) {
+  const checks = contrastChecks(t, states);
   const passed = checks.filter((c) => c.pass).length;
   const swatches = [t.bg, t.surface, t.border, t.text, t.muted, t.primary, t.onPrimary, t.accent];
 

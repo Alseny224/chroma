@@ -1,0 +1,83 @@
+/* ---------------------------------------------------------------------------
+   Base — styles des éléments HTML (sélecteurs :where(), faciles à surcharger)
+   ------------------------------------------------------------------------ */
+
+:where(html) {
+  color-scheme: light;
+}
+:where([data-theme='dark'], .dark) {
+  color-scheme: dark;
+}
+
+:where(body) {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-heading);
+  color: var(--color-text);
+}
+:where(h1) {
+  font-size: var(--text-4xl);
+  line-height: var(--text-4xl--line-height);
+}
+:where(h2) {
+  font-size: var(--text-3xl);
+  line-height: var(--text-3xl--line-height);
+}
+:where(h3) {
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
+}
+:where(h4) {
+  font-size: var(--text-xl);
+  line-height: var(--text-xl--line-height);
+}
+:where(h5) {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+}
+:where(h6) {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+}
+
+:where(p) {
+  margin: 0 0 var(--space-4);
+}
+:where(small) {
+  font-size: var(--text-sm);
+}
+:where(a) {
+  color: var(--color-primary);
+  text-underline-offset: 0.2em;
+}
+:where(a:hover) {
+  color: var(--color-primary-hover);
+}
+:where(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+:where(hr) {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-6) 0;
+}
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+}
+:where(:focus-visible) {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}

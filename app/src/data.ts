@@ -27,11 +27,13 @@ export const SOURCES: { id: SourceId; label: string }[] = [
   { id: 'logo', label: 'Logo' },
 ];
 
-export type PreviewId = 'landing' | 'shop' | 'dash';
+export type PreviewId = 'landing' | 'shop' | 'dash' | 'components' | 'system';
 export const PREVIEWS: { id: PreviewId; label: string; url: string; caption: string }[] = [
   { id: 'landing', label: 'Landing page', url: 'ateliernord.fr', caption: 'Hero, navigation, cartes et boutons' },
   { id: 'shop', label: 'Boutique', url: 'maison-argile.fr/nouveautes', caption: 'Fiches produit, filtres et panier' },
   { id: 'dash', label: 'Dashboard', url: 'app.pilotage.fr/vue-ensemble', caption: 'Navigation, indicateurs, graphique et tableau' },
+  { id: 'components', label: 'Composants', url: 'kit.chroma/composants', caption: 'Le kit exporté : boutons, formulaires, alertes, cartes, modale…' },
+  { id: 'system', label: 'Système', url: 'kit.chroma/systeme', caption: 'Nuances, couleurs d’état, typographie, espacements, arrondis, ombres' },
 ];
 
 export const TASKS = [

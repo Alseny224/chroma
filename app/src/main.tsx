@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { syncColorScheme } from './scheme';
 import './brand.css';
+import './kit/components.css';
 import './styles.css';
 
 syncColorScheme();

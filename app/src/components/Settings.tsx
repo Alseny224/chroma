@@ -2,8 +2,11 @@ import type { ChangeEvent } from 'react';
 import { INSPIRATIONS, PRESETS, SOURCES } from '../data';
 import { isHex6, normalizeHex } from '../lib/color';
 import { dominantColor } from '../lib/logo';
-import { buildTheme, MOOD_IDS, MOODS } from '../lib/theme';
-import type { ChromaState, Patch } from '../state';
+import { FONT_PAIR_IDS, FONT_PAIRS, type FontPairId } from '../lib/fonts';
+import { DENSITIES, SCALE_RATIOS } from '../lib/system';
+import { buildTheme, MOOD_IDS, MOODS, type DensityId, type ScaleId } from '../lib/theme';
+import { moodDefaults, type ChromaState, type Patch } from '../state';
+import { Segmented } from './Segmented';
 
 interface Props {
   state: ChromaState;
@@ -12,18 +15,27 @@ interface Props {
 
 export function Settings({ state, set }: Props) {
   return (
-    <section aria-label="Réglages" className="column">
+    <section aria-label="Réglages" className="column column--settings">
       <SourceCard state={state} set={set} />
       <MoodCard state={state} set={set} />
+      <SystemCard state={state} set={set} />
       <AdjustCard state={state} set={set} />
     </section>
+  );
+}
+
+function Step({ n }: { n: number }) {
+  return (
+    <span className="step-dot" aria-hidden="true">
+      {n}
+    </span>
   );
 }
 
 function SourceCard({ state, set }: Props) {
   return (
     <div className="card">
-      <h2 className="card__title">Point de départ</h2>
+      <h2 className="card__title"><Step n={1} />Point de départ</h2>
       <div role="group" aria-label="Source" className="source-grid">
         {SOURCES.map((s) => (
           <button
@@ -114,7 +126,7 @@ function InspirationSource({ state, set }: Props) {
           className="inspiration"
           aria-pressed={state.seed === i.hex && state.mood === i.mood}
           onClick={() =>
-            set({ seed: i.hex, draft: i.hex, mood: i.mood, radius: MOODS[i.mood].radius, hue: 0, sat: 100 })
+            set({ seed: i.hex, draft: i.hex, mood: i.mood, ...moodDefaults(i.mood), hue: 0, sat: 100 })
           }
         >
           <span aria-hidden="true" className="inspiration__swatch">
@@ -177,7 +189,7 @@ function LogoSource({ state, set }: Props) {
 function MoodCard({ state, set }: Props) {
   return (
     <div className="card card--gap-14">
-      <h2 className="card__title">Ambiance</h2>
+      <h2 className="card__title"><Step n={2} />Ambiance</h2>
       <div role="group" aria-label="Ambiance" className="chips">
         {MOOD_IDS.map((id) => (
           <button
@@ -185,7 +197,7 @@ function MoodCard({ state, set }: Props) {
             type="button"
             className="choice choice--pill"
             aria-pressed={state.mood === id}
-            onClick={() => set({ mood: id, radius: MOODS[id].radius })}
+            onClick={() => set({ mood: id, ...moodDefaults(id) })}
           >
             {MOODS[id].label}
           </button>
@@ -196,10 +208,46 @@ function MoodCard({ state, set }: Props) {
   );
 }
 
+const SCALE_OPTIONS = (Object.keys(SCALE_RATIOS) as ScaleId[]).map((id) => ({ id, label: SCALE_RATIOS[id].label }));
+const DENSITY_OPTIONS = (Object.keys(DENSITIES) as DensityId[]).map((id) => ({ id, label: DENSITIES[id].label }));
+
+function SystemCard({ state, set }: Props) {
+  const auto = FONT_PAIRS[MOODS[state.mood].fonts].label.split(' — ')[0];
+  return (
+    <div className="card card--gap-18">
+      <h2 className="card__title"><Step n={3} />Système</h2>
+      <div className="field">
+        <label htmlFor="sys-fonts" className="field__label">Typographie</label>
+        <select
+          id="sys-fonts"
+          className="text-input select-input"
+          value={state.fonts}
+          onChange={(e) => set({ fonts: e.target.value as FontPairId | 'auto' })}
+        >
+          <option value="auto">Selon l’ambiance ({auto})</option>
+          {FONT_PAIR_IDS.map((id) => (
+            <option key={id} value={id}>
+              {FONT_PAIRS[id].label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="field">
+        <span className="field__label">Échelle typographique</span>
+        <Segmented label="Échelle typographique" options={SCALE_OPTIONS} value={state.scale} onChange={(scale) => set({ scale })} />
+      </div>
+      <div className="field">
+        <span className="field__label">Densité</span>
+        <Segmented label="Densité" options={DENSITY_OPTIONS} value={state.density} onChange={(density) => set({ density })} />
+      </div>
+    </div>
+  );
+}
+
 function AdjustCard({ state, set }: Props) {
   return (
     <div className="card card--gap-18">
-      <h2 className="card__title">Ajuster en direct</h2>
+      <h2 className="card__title"><Step n={4} />Ajuster en direct</h2>
       <Slider id="r-hue" label="Teinte" min={-180} max={180} value={state.hue}
         display={`${state.hue > 0 ? '+' : ''}${state.hue}°`} onChange={(v) => set({ hue: v })} />
       <Slider id="r-sat" label="Saturation" min={0} max={150} value={state.sat}
@@ -209,7 +257,7 @@ function AdjustCard({ state, set }: Props) {
       <button
         type="button"
         className="btn-outline"
-        onClick={() => set({ hue: 0, sat: 100, radius: MOODS[state.mood].radius })}
+        onClick={() => set({ hue: 0, sat: 100, fonts: 'auto', ...moodDefaults(state.mood) })}
       >
         Réinitialiser les réglages
       </button>

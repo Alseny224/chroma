@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { PRESETS } from '../data';
-import { EXPORT_FORMATS, exportTheme, type ExportFormat } from '../lib/export';
+import { exportTheme, type ExportFormat } from '../lib/export';
+import { buildSystem, type DesignSystem } from '../lib/system';
 import { buildTheme, MOOD_IDS, MOODS, themeVars, type MoodId } from '../lib/theme';
 import { HeroDemo } from './HeroDemo';
+import { KitShowcase } from './KitShowcase';
 import { generatorUrl } from './links';
 
 // Chaque couleur de la démo automatique est associée à une ambiance.
@@ -28,9 +30,9 @@ export function Landing() {
     setDemo((d) => ({ ...d, ...patch }));
   };
 
-  const input = { ...demo, hue: 0, sat: 100, radius: MOODS[demo.mood].radius };
-  const light = buildTheme(input, false);
-  const darkTheme = buildTheme(input, true);
+  const M = MOODS[demo.mood];
+  const sys = buildSystem({ ...demo, hue: 0, sat: 100, radius: M.radius, scale: M.scale, density: M.density });
+  const { light, dark: darkTheme } = sys;
 
   return (
     <div className="lp">
@@ -39,10 +41,6 @@ export function Landing() {
         <section className="hero">
           <div className="container hero__grid">
             <div className="hero__copy">
-              <span className="eyebrow">
-                <span className="eyebrow__dot" aria-hidden="true" />
-                Générateur de thèmes · gratuit
-              </span>
               <h1 className="hero__title">
                 Une couleur.
                 <br />
@@ -65,6 +63,7 @@ export function Landing() {
               </div>
               <ul className="hero__trust">
                 <li>Sans inscription</li>
+                <li>Tailwind, shadcn/ui, React ou CSS</li>
                 <li>Rien n'est envoyé : tout tourne dans ton navigateur</li>
               </ul>
             </div>
@@ -73,6 +72,7 @@ export function Landing() {
               mood={demo.mood}
               dark={dark}
               theme={dark ? darkTheme : light}
+              states={sys.states[dark ? 'dark' : 'light']}
               onSeed={(seed) => update({ seed })}
               onMood={(mood) => update({ mood })}
               onDark={(d) => {
@@ -85,10 +85,10 @@ export function Landing() {
 
         <section className="stats" aria-label="Chroma en chiffres">
           <div className="container stats__grid">
-            <Stat value="8" label="rôles de couleur cohérents" />
-            <Stat value="2" label="modes, clair et sombre" />
-            <Stat value="5" label="ambiances prêtes à l'emploi" />
-            <Stat value="3" label="formats d'export" />
+            <Stat value="77" label="nuances, du primaire aux états" />
+            <Stat value="17" label="composants prêts à l'emploi" />
+            <Stat value="10" label="contrôles de contraste WCAG" />
+            <Stat value="7" label="formats d'export" />
           </div>
         </section>
 
@@ -105,7 +105,8 @@ export function Landing() {
                 ensuite la teinte au curseur.
               </Step>
               <Step n={3} title="Exporte et code">
-                Copie tes variables CSS, ta config Tailwind ou tes tokens Figma. Modes clair et sombre inclus.
+                Thème Tailwind, shadcn/ui ou CSS, plus le kit de composants en React ou en CSS. Clair et sombre
+                inclus.
               </Step>
             </ol>
           </div>
@@ -115,17 +116,22 @@ export function Landing() {
           <div className="container">
             <SectionHead
               kicker="Fonctionnalités"
-              title="Tout ce qu'il faut pour un thème qui tient la route."
-              lead="Pas une simple palette : un système de couleurs pensé pour de vraies interfaces."
+              title="Un design system complet, pas une palette."
+              lead="Tout ce que tu dessinais à la main à chaque projet, généré et cohérent en quelques secondes."
             />
             <div className="features">
               <Feature icon={<IconCheck />} title="Contraste WCAG garanti">
-                Chroma ajuste la luminosité du primaire, de l'accent et du texte secondaire pour tenir les seuils AA,
-                quelle que soit la couleur de départ.
+                Texte, boutons, bordures de champs, couleurs d'état : 10 paires vérifiées et ajustées
+                automatiquement, quelle que soit la couleur de départ.
               </Feature>
-              <Feature icon={<IconLayout />} title="Aperçu sur de vraies pages">
-                Landing page, boutique, dashboard : juge ton thème sur des boutons, des cartes et des graphiques, pas
-                sur des carrés de couleur.
+              <Feature icon={<IconSliders />} title="Tout le système">
+                Nuances 50 → 950, succès / attention / erreur / info, typographie, espacements, arrondis et ombres.
+              </Feature>
+              <Feature icon={<IconLayout />} title="Kit de composants">
+                Boutons, formulaires, alertes, cartes, onglets, tableau, modale… accessibles et déjà à tes couleurs.
+              </Feature>
+              <Feature icon={<IconCode />} title="Prêt pour ta stack">
+                Tailwind v4 ou v3, shadcn/ui pour Next.js, composants React typés, CSS pur ou tokens Figma.
               </Feature>
               <Feature icon={<IconMoon />} title="Clair et sombre d'un coup">
                 Chaque thème est livré avec son pendant sombre, calculé et vérifié lui aussi.
@@ -133,17 +139,22 @@ export function Landing() {
               <Feature icon={<IconImage />} title="Depuis ton logo">
                 Dépose un PNG, un JPG ou un SVG : la couleur dominante devient la base de ton thème.
               </Feature>
-              <Feature icon={<IconSliders />} title="Ajustable en direct">
-                Teinte, saturation, arrondis : chaque curseur met à jour l'aperçu et les contrastes instantanément.
-              </Feature>
-              <Feature icon={<IconCode />} title="Prêt pour ton code">
-                Variables CSS, Tailwind ou tokens au format W3C pour Figma : colle et c'est parti.
-              </Feature>
             </div>
           </div>
         </section>
 
-        <section id="ambiances" className="section">
+        <section id="composants" className="section">
+          <div className="container">
+            <SectionHead
+              kicker="Composants"
+              title="Des composants, pas juste des couleurs."
+              lead="Le kit que tu exportes, en direct, aux couleurs de la démo. Change de couleur en haut de page : il suit."
+            />
+            <KitShowcase sys={sys} mode={dark ? 'dark' : 'light'} />
+          </div>
+        </section>
+
+        <section id="ambiances" className="section section--tinted">
           <div className="container">
             <SectionHead
               kicker="Ambiances"
@@ -158,7 +169,7 @@ export function Landing() {
           </div>
         </section>
 
-        <ExportShowcase light={light} dark={darkTheme} seed={demo.seed} mood={demo.mood} radius={input.radius} />
+        <ExportShowcase sys={sys} />
 
         <section className="section">
           <div className="container">
@@ -180,6 +191,7 @@ export function Landing() {
           <span className="footer__note">De l'inspiration au thème prêt à créer.</span>
           <nav className="footer__links" aria-label="Pied de page">
             <a href="#fonctionnalites">Fonctionnalités</a>
+            <a href="#composants">Composants</a>
             <a href="#ambiances">Ambiances</a>
             <a href={generatorUrl()}>Générateur</a>
           </nav>
@@ -199,11 +211,15 @@ function Nav() {
         <nav className="nav__links" aria-label="Principale">
           <a href="#comment">Comment ça marche</a>
           <a href="#fonctionnalites">Fonctionnalités</a>
+          <a href="#composants">Composants</a>
           <a href="#ambiances">Ambiances</a>
           <a href="#export">Export</a>
         </nav>
         <a className="btn btn--primary" href={generatorUrl()}>
-          Ouvrir le générateur
+          {/* Un seul nœud texte : le gap du bouton ne s'insère pas entre les mots. */}
+          <span>
+            Ouvrir<span className="nav__cta-long"> le générateur</span>
+          </span>
         </a>
       </div>
     </header>
@@ -286,11 +302,18 @@ function MoodCard({ id, seed }: { id: MoodId; seed: string }) {
   );
 }
 
-function ExportShowcase(props: Parameters<typeof exportTheme>[1]) {
+const SHOWCASE_FORMATS: { id: ExportFormat; label: string }[] = [
+  { id: 'css', label: 'CSS' },
+  { id: 'tailwind4', label: 'Tailwind' },
+  { id: 'shadcn', label: 'shadcn/ui' },
+  { id: 'components', label: 'Composants' },
+];
+
+function ExportShowcase({ sys }: { sys: DesignSystem }) {
   const [format, setFormat] = useState<ExportFormat>('css');
   const [copied, setCopied] = useState(false);
   const timer = useRef<number>();
-  const code = exportTheme(format, props);
+  const code = exportTheme(format, sys);
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
@@ -306,7 +329,7 @@ function ExportShowcase(props: Parameters<typeof exportTheme>[1]) {
   };
 
   return (
-    <section id="export" className="section section--tinted">
+    <section id="export" className="section">
       <div className="container export-grid">
         <div>
           <SectionHead
@@ -315,15 +338,15 @@ function ExportShowcase(props: Parameters<typeof exportTheme>[1]) {
             lead="Le code du thème affiché plus haut, en direct. Change de couleur dans la démo et regarde-le se mettre à jour."
           />
           <ul className="checklist">
-            <li>Variables CSS avec le mode sombre via [data-theme]</li>
-            <li>Config Tailwind branchée sur ces variables</li>
-            <li>Tokens W3C importables dans Figma</li>
+            <li>Variables CSS, Tailwind v3/v4, shadcn/ui ou tokens Figma</li>
+            <li>Nuances 50 → 950, couleurs d'état, typo, espacements, ombres</li>
+            <li>Kit de composants en CSS pur ou en React/Next.js</li>
           </ul>
         </div>
         <div className="code">
           <div className="code__bar">
             <div role="group" aria-label="Format d'export" className="code__tabs">
-              {EXPORT_FORMATS.map((f) => (
+              {SHOWCASE_FORMATS.map((f) => (
                 <button
                   key={f.id}
                   type="button"

@@ -18,8 +18,13 @@ npm run build    # build de production dans dist/
 ```
 src/
   lib/color.ts      conversions hex/rgb/hsl, contraste WCAG, ajustement de luminosité
-  lib/theme.ts      ambiances + buildTheme() : génère les 8 rôles de couleur
-  lib/export.ts     exports CSS / Tailwind / Figma
+  lib/theme.ts      ambiances + buildTheme() : rôles de couleur clair/sombre
+  lib/system.ts     buildSystem() : nuances 50→950, états, typo, espacements,
+                    arrondis, ombres + variables CSS (source unique des exports)
+  lib/fonts.ts      paires de polices (Google Fonts)
+  lib/export.ts     exports CSS, Tailwind v4/v3, shadcn/ui, Figma, composants
+  kit/              base.css + components.css (classes ui-*) + ui.tsx (React),
+                    affichés dans l'aperçu ET exportés tels quels
   lib/logo.ts       extraction de la couleur dominante d'une image
   landing/          landing page (accueil) avec démo interactive
   lib/checks.ts     contrôles de contraste WCAG partagés
