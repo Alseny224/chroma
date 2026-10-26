@@ -44,6 +44,8 @@ a:hover {
 }
 button {
   font: inherit;
+  /* Pas de flash gris/bleu au toucher : chaque bouton a son propre état actif. */
+  -webkit-tap-highlight-color: transparent;
 }
 input[type='range'] {
   accent-color: var(--action);
@@ -1661,5 +1663,91 @@ input[type='range'] {
   .pv-task__label {
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+}
+
+/* ==========================================================================
+   Mobile et tablette (< 900 px) : aperçu épinglé en haut, réglages dessous.
+   Chaque réglage reste visible dans l'aperçu pendant qu'on le modifie.
+   ========================================================================== */
+
+@media (max-width: 899px) {
+  :root {
+    --header-h: 60px;
+    --preview-h: max(44dvh, 300px);
+  }
+  /* Le défilement automatique (focus, ancres) s'arrête sous l'aperçu épinglé,
+     pour qu'un champ ne soit jamais masqué (WCAG 2.4.11). */
+  html {
+    scroll-padding-top: calc(var(--header-h) + var(--preview-h) + 12px);
+  }
+  .header {
+    position: sticky;
+    flex-wrap: nowrap;
+    min-height: var(--header-h);
+    padding: 8px 12px;
+  }
+  .header__tagline,
+  .header .btn-label {
+    display: none;
+  }
+  .header__actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  /* « Copier le lien » devient une icône. */
+  .header .btn-ghost {
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+  .header .btn-dark {
+    padding: 0 14px;
+  }
+
+  .workspace {
+    grid-template-areas: 'preview' 'settings' 'inspector';
+    padding: 0 12px 24px;
+    gap: 16px;
+  }
+  .column--preview {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 10;
+    height: var(--preview-h);
+    margin: 0 -12px;
+    padding: 8px 12px 12px;
+    gap: 8px;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    background: var(--canvas);
+    box-shadow: 0 10px 18px -14px rgb(0 0 0 / 0.35);
+  }
+  /* Les onglets de page restent, le titre et la légende disparaissent. */
+  .preview .section-head__titles,
+  .browser__dots {
+    display: none;
+  }
+  .browser {
+    border-radius: 14px;
+  }
+  .browser__bar {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  .browser__url {
+    margin: 0;
+    max-width: none;
+  }
+  .kit {
+    gap: 24px;
+    padding: 16px;
+  }
+  /* Le contenu de l'aperçu défile dans son cadre. */
+  .browser > .pv {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 }

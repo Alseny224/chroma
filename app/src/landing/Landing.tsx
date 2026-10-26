@@ -46,7 +46,7 @@ export function Landing() {
                 <br />
                 Un thème complet.
                 <br />
-                <span className="hero__highlight">Accessible par défaut.</span>
+                <span className="hero__second">Accessible par défaut.</span>
               </h1>
               <p className="hero__lead">
                 Choisis une teinte, une ambiance ou ton logo. Chroma compose une palette claire et sombre qui respecte
@@ -57,15 +57,13 @@ export function Landing() {
                   Créer mon thème
                   <Arrow />
                 </a>
-                <a className="btn btn--ghost btn--lg" href="#comment">
-                  Comment ça marche
+                <a className="link-quiet" href="#composants">
+                  Voir les composants
                 </a>
               </div>
-              <ul className="hero__trust">
-                <li>Sans inscription</li>
-                <li>Tailwind, shadcn/ui, React ou CSS</li>
-                <li>Rien n'est envoyé : tout tourne dans ton navigateur</li>
-              </ul>
+              <p className="hero__note">
+                Gratuit, sans inscription. Exports Tailwind, shadcn/ui, React ou CSS.
+              </p>
             </div>
             <HeroDemo
               seed={demo.seed}
@@ -83,81 +81,44 @@ export function Landing() {
           </div>
         </section>
 
-        <section className="stats" aria-label="Chroma en chiffres">
-          <div className="container stats__grid">
-            <Stat value="77" label="nuances, du primaire aux états" />
-            <Stat value="17" label="composants prêts à l'emploi" />
-            <Stat value="10" label="contrôles de contraste WCAG" />
-            <Stat value="7" label="formats d'export" />
-          </div>
-        </section>
-
-        <section id="comment" className="section">
-          <div className="container">
-            <SectionHead kicker="Comment ça marche" title="Du coup de cœur au code, en trois étapes." />
-            <ol className="steps">
-              <Step n={1} title="Choisis un point de départ">
-                Une couleur de ta marque, une inspiration toute faite ou ton logo : Chroma en extrait la teinte
-                dominante.
-              </Step>
-              <Step n={2} title="Règle l'ambiance">
-                Calme, vif, luxe, tech ou naturel : saturation, accent, arrondis et typographie s'accordent. Affine
-                ensuite la teinte au curseur.
-              </Step>
-              <Step n={3} title="Exporte et code">
-                Thème Tailwind, shadcn/ui ou CSS, plus le kit de composants en React ou en CSS. Clair et sombre
-                inclus.
-              </Step>
-            </ol>
-          </div>
-        </section>
-
-        <section id="fonctionnalites" className="section section--tinted">
-          <div className="container">
+        <section id="systeme" className="section">
+          <div className="container split">
             <SectionHead
-              kicker="Fonctionnalités"
               title="Un design system complet, pas une palette."
-              lead="Tout ce que tu dessinais à la main à chaque projet, généré et cohérent en quelques secondes."
+              lead="Tout ce que tu redessinais à chaque projet, généré d'un coup et cohérent."
             />
-            <div className="features">
-              <Feature icon={<IconCheck />} title="Contraste WCAG garanti">
-                Texte, boutons, bordures de champs, couleurs d'état : 10 paires vérifiées et ajustées
+            <dl className="facts">
+              <Fact title="Des contrastes tenus">
+                Texte, boutons, bordures de champs et couleurs d'état : dix paires vérifiées et ajustées
                 automatiquement, quelle que soit la couleur de départ.
-              </Feature>
-              <Feature icon={<IconSliders />} title="Tout le système">
-                Nuances 50 → 950, succès / attention / erreur / info, typographie, espacements, arrondis et ombres.
-              </Feature>
-              <Feature icon={<IconLayout />} title="Kit de composants">
-                Boutons, formulaires, alertes, cartes, onglets, tableau, modale… accessibles et déjà à tes couleurs.
-              </Feature>
-              <Feature icon={<IconCode />} title="Prêt pour ta stack">
-                Tailwind v4 ou v3, shadcn/ui pour Next.js, composants React typés, CSS pur ou tokens Figma.
-              </Feature>
-              <Feature icon={<IconMoon />} title="Clair et sombre d'un coup">
+              </Fact>
+              <Fact title="Tout le système">
+                Des nuances de 50 à 950, quatre couleurs d'état, une échelle typographique, des espacements, des
+                arrondis et des ombres qui vont ensemble.
+              </Fact>
+              <Fact title="Clair et sombre">
                 Chaque thème est livré avec son pendant sombre, calculé et vérifié lui aussi.
-              </Feature>
-              <Feature icon={<IconImage />} title="Depuis ton logo">
-                Dépose un PNG, un JPG ou un SVG : la couleur dominante devient la base de ton thème.
-              </Feature>
-            </div>
+              </Fact>
+              <Fact title="Depuis ton logo">
+                Dépose un PNG, un JPG ou un SVG : sa couleur dominante devient la base du thème.
+              </Fact>
+            </dl>
           </div>
         </section>
 
         <section id="composants" className="section">
           <div className="container">
             <SectionHead
-              kicker="Composants"
               title="Des composants, pas juste des couleurs."
-              lead="Le kit que tu exportes, en direct, aux couleurs de la démo. Change de couleur en haut de page : il suit."
+              lead="Le kit que tu exportes, affiché ici aux couleurs de la démo. Change de couleur en haut de page : il suit."
             />
             <KitShowcase sys={sys} mode={dark ? 'dark' : 'light'} />
           </div>
         </section>
 
-        <section id="ambiances" className="section section--tinted">
+        <section id="ambiances" className="section">
           <div className="container">
             <SectionHead
-              kicker="Ambiances"
               title="Même couleur, cinq personnalités."
               lead="Chaque ambiance règle la saturation, l'accent, les arrondis et la typographie. Voici ta couleur actuelle dans chacune d'elles."
             />
@@ -171,16 +132,13 @@ export function Landing() {
 
         <ExportShowcase sys={sys} />
 
-        <section className="section">
-          <div className="container">
-            <div className="cta">
-              <h2 className="cta__title">Ton prochain thème est à un clic.</h2>
-              <p className="cta__lead">Gratuit, sans compte, et tes couleurs ne quittent jamais ton navigateur.</p>
-              <a className="btn btn--inverse btn--lg" href={generatorUrl(demo.seed, demo.mood)}>
-                Ouvrir le générateur
-                <Arrow />
-              </a>
-            </div>
+        <section className="section closing">
+          <div className="container closing__inner">
+            <h2 className="closing__title">Ton prochain projet commence avec un thème fini.</h2>
+            <a className="btn btn--primary btn--lg" href={generatorUrl(demo.seed, demo.mood)}>
+              Ouvrir le générateur
+              <Arrow />
+            </a>
           </div>
         </section>
       </main>
@@ -188,9 +146,9 @@ export function Landing() {
       <footer className="footer">
         <div className="container footer__inner">
           <Logo />
-          <span className="footer__note">De l'inspiration au thème prêt à créer.</span>
+          <span className="footer__note">Tout se passe dans ton navigateur : aucune couleur n'est envoyée.</span>
           <nav className="footer__links" aria-label="Pied de page">
-            <a href="#fonctionnalites">Fonctionnalités</a>
+            <a href="#systeme">Système</a>
             <a href="#composants">Composants</a>
             <a href="#ambiances">Ambiances</a>
             <a href={generatorUrl()}>Générateur</a>
@@ -209,8 +167,7 @@ function Nav() {
           <Logo />
         </a>
         <nav className="nav__links" aria-label="Principale">
-          <a href="#comment">Comment ça marche</a>
-          <a href="#fonctionnalites">Fonctionnalités</a>
+          <a href="#systeme">Système</a>
           <a href="#composants">Composants</a>
           <a href="#ambiances">Ambiances</a>
           <a href="#export">Export</a>
@@ -240,45 +197,20 @@ function Logo() {
   );
 }
 
-function SectionHead({ kicker, title, lead }: { kicker: string; title: string; lead?: string }) {
+function SectionHead({ title, lead }: { title: string; lead?: string }) {
   return (
     <div className="section-head">
-      <span className="kicker">{kicker}</span>
       <h2 className="section-head__title">{title}</h2>
       {lead && <p className="section-head__lead">{lead}</p>}
     </div>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Fact({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="stat">
-      <span className="stat__value">{value}</span>
-      <span className="stat__label">{label}</span>
-    </div>
-  );
-}
-
-function Step({ n, title, children }: { n: number; title: string; children: ReactNode }) {
-  return (
-    <li className="step">
-      <span className="step__n" aria-hidden="true">
-        {String(n).padStart(2, '0')}
-      </span>
-      <h3 className="step__title">{title}</h3>
-      <p className="step__text">{children}</p>
-    </li>
-  );
-}
-
-function Feature({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
-  return (
-    <div className="feature">
-      <span className="feature__icon" aria-hidden="true">
-        {icon}
-      </span>
-      <h3 className="feature__title">{title}</h3>
-      <p className="feature__text">{children}</p>
+    <div className="fact">
+      <dt className="fact__title">{title}</dt>
+      <dd className="fact__text">{children}</dd>
     </div>
   );
 }
@@ -333,15 +265,13 @@ function ExportShowcase({ sys }: { sys: DesignSystem }) {
       <div className="container export-grid">
         <div>
           <SectionHead
-            kicker="Export"
             title="Colle, c'est prêt."
-            lead="Le code du thème affiché plus haut, en direct. Change de couleur dans la démo et regarde-le se mettre à jour."
+            lead="Le code du thème affiché plus haut, mis à jour en direct."
           />
-          <ul className="checklist">
-            <li>Variables CSS, Tailwind v3/v4, shadcn/ui ou tokens Figma</li>
-            <li>Nuances 50 → 950, couleurs d'état, typo, espacements, ombres</li>
-            <li>Kit de composants en CSS pur ou en React/Next.js</li>
-          </ul>
+          <p className="prose">
+            Un thème Tailwind v4 ou v3, un <code>globals.css</code> pour shadcn/ui, des variables CSS ou des tokens
+            Figma. Le kit de composants suit, en CSS pur ou en React pour Next.js.
+          </p>
         </div>
         <div className="code">
           <div className="code__bar">
@@ -379,52 +309,3 @@ function Arrow() {
     </svg>
   );
 }
-
-const iconProps = {
-  width: 22,
-  height: 22,
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 1.8,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-};
-
-const IconCheck = () => (
-  <svg {...iconProps}>
-    <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z" />
-    <path d="m9 12 2 2 4-4" />
-  </svg>
-);
-const IconLayout = () => (
-  <svg {...iconProps}>
-    <rect x="3" y="4" width="18" height="16" rx="2" />
-    <path d="M3 9h18M9 20V9" />
-  </svg>
-);
-const IconMoon = () => (
-  <svg {...iconProps}>
-    <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
-  </svg>
-);
-const IconImage = () => (
-  <svg {...iconProps}>
-    <rect x="3" y="3" width="18" height="18" rx="3" />
-    <circle cx="9" cy="9" r="2" />
-    <path d="m21 15-5-5L5 21" />
-  </svg>
-);
-const IconSliders = () => (
-  <svg {...iconProps}>
-    <path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" />
-    <circle cx="16" cy="6" r="2" />
-    <circle cx="10" cy="12" r="2" />
-    <circle cx="18" cy="18" r="2" />
-  </svg>
-);
-const IconCode = () => (
-  <svg {...iconProps}>
-    <path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />
-  </svg>
-);
