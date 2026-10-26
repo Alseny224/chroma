@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { contrastRatio, hexToOklch } from './color';
 import { exportTheme, EXPORT_FORMATS } from './export';
 import { FONT_PAIR_IDS } from './fonts';
-import { buildSystem, PALETTES, STATES, STEPS, systemVars, type SystemInput } from './system';
+import { buildSystem, PALETTES, shadowCss, STATES, STEPS, systemVars, type SystemInput } from './system';
 import { MOOD_IDS, MOODS } from './theme';
 
 const input = (over: Partial<SystemInput> = {}): SystemInput => ({
@@ -116,6 +116,13 @@ describe('exports', () => {
       expect(css).toMatch(new RegExp(`${v}: oklch\\(`));
     expect(css).toContain('.dark {');
     expect(css).toContain('--color-primary: var(--primary);');
+  });
+
+  it('shadcn/ui : les ombres du mode sombre sont celles du mode sombre', () => {
+    const css = exportTheme('shadcn', sys);
+    const dark = css.slice(css.indexOf('.dark {'));
+    expect(dark).toContain(`--chroma-shadow-lg: ${shadowCss(sys.shadows.lg, sys.shadowColor.dark, 'dark')};`);
+    expect(css).toContain('--shadow-lg: var(--chroma-shadow-lg);');
   });
 
   it('les tokens Figma sont du JSON valide', () => {

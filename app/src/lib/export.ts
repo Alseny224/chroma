@@ -194,7 +194,11 @@ function shadcnVars(sys: DesignSystem, mode: Mode): [string, string][] {
       [`--${s}`, o(st[s].base)],
       [`--${s}-foreground`, o(st[s].on)],
     ]),
-    ['--shadow-color', mode === 'dark' ? '0 0 0' : sys.shadowColor.light],
+    // Ombres propres à chaque mode : en sombre, elles doivent être bien plus opaques.
+    ...(['sm', 'md', 'lg', 'xl'] as const).map((k): [string, string] => [
+      `--chroma-shadow-${k}`,
+      shadowCss(sys.shadows[k], sys.shadowColor[mode], mode),
+    ]),
   ];
 }
 
@@ -202,7 +206,7 @@ function toShadcn(sys: DesignSystem): string {
   const lines = (vars: [string, string][]) => vars.map(([k, v]) => `  ${k}: ${v};`).join('\n');
   const mapped = shadcnVars(sys, 'light')
     .map(([k]) => k)
-    .filter((k) => k !== '--shadow-color')
+    .filter((k) => !k.startsWith('--chroma-shadow-'))
     .map((k) => `  --color-${k.slice(2)}: var(${k});`);
   return (
     header(sys, 'thème shadcn/ui (Tailwind v4)') +
@@ -218,7 +222,7 @@ function toShadcn(sys: DesignSystem): string {
     `  --font-mono: ${sys.fonts.mono};\n` +
     '  --radius-sm: calc(var(--radius) * 0.6);\n  --radius-md: calc(var(--radius) * 0.8);\n  --radius-lg: var(--radius);\n  --radius-xl: calc(var(--radius) * 1.4);\n' +
     (['sm', 'md', 'lg', 'xl'] as const)
-      .map((k) => `  --shadow-${k}: ${shadowCss(sys.shadows[k], 'var(--shadow-color)', 'light')};`)
+      .map((k) => `  --shadow-${k}: var(--chroma-shadow-${k});`)
       .join('\n') +
     '\n' +
     mapped.join('\n') +
