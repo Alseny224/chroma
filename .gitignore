@@ -1,0 +1,5 @@
+# Archive d'origine (son contenu est extrait dans source/)
+*.zip
+node_modules/
+dist/
+*.tsbuildinfo

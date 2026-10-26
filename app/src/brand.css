@@ -1,0 +1,23 @@
+/* Chroma — ambiance « Tech », base #059669 */
+:root {
+  --color-bg: #FBFCFB;
+  --color-surface: #F1F6F2;
+  --color-border: #DAE4DB;
+  --color-text: #19291B;
+  --color-text-muted: #58745C;
+  --color-primary: #028415;
+  --color-on-primary: #FFFFFF;
+  --color-accent: #FB0F64;
+  --radius: 28px;
+}
+
+[data-theme="dark"] {
+  --color-bg: #101911;
+  --color-surface: #18251A;
+  --color-border: #314434;
+  --color-text: #F1F4F1;
+  --color-text-muted: #AABBAD;
+  --color-primary: #37FB52;
+  --color-on-primary: #101911;
+  --color-accent: #FB4184;
+}

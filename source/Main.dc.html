@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Chroma — Générateur de thèmes</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F3F4F6}
+a{color:#111318}a:hover{color:#3A3F4B}
+input[type=range]{accent-color:#111318}
+button{font:inherit}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F3F4F6; color: #111318; font-family: 'Inter', system-ui, sans-serif; font-size: 14px">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 14px 24px; background: #FFFFFF; border-bottom: 1px solid #E3E5EA">
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="2" width="11" height="11" rx="3" fill="{{t.primary}}"></rect><rect x="15" y="2" width="11" height="11" rx="3" fill="{{t.accent}}"></rect><rect x="2" y="15" width="11" height="11" rx="3" fill="{{t.text}}"></rect><rect x="15" y="15" width="11" height="11" rx="3" fill="{{t.surface}}" stroke="#D5D8DF"></rect></svg>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.02em">Chroma</span>
+      </div>
+      <span style="color: #5B616E; font-size: 13px">De l'inspiration au thème prêt à créer</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+      <div role="group" aria-label="Mode du thème" style="display: flex; padding: 3px; background: #F3F4F6; border: 1px solid #E3E5EA; border-radius: 10px">
+        <sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+          <button type="button" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 500; background: {{m.bg}}; color: {{m.fg}}; box-shadow: {{m.shadow}}">{{m.label}}</button>
+        </sc-for>
+      </div>
+      <a href="#export" style="display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 18px; border-radius: 10px; background: #111318; color: #FFFFFF; text-decoration: none; font-weight: 600">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        Exporter
+      </a>
+    </div>
+  </header>
+
+  <main style="max-width: 1520px; margin: 0 auto; padding: 24px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; box-sizing: border-box">
+
+    <!-- Colonne gauche : réglages -->
+    <section aria-label="Réglages" style="flex: 1 1 290px; max-width: 360px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Point de départ</h2>
+        <div role="group" aria-label="Source" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{sources}}" as="s" hint-placeholder-count="3">
+            <button type="button" aria-pressed="{{s.pressed}}" onClick="{{s.pick}}" style="min-height: 44px; border-radius: 10px; border: 1px solid {{s.bd}}; background: {{s.bg}}; color: {{s.fg}}; cursor: pointer; font-weight: 500">{{s.label}}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{isColor}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+              <sc-for list="{{presets}}" as="p" hint-placeholder-count="8">
+                <button type="button" aria-label="{{p.name}}" title="{{p.name}}" onClick="{{p.pick}}" style="height: 48px; border-radius: 12px; cursor: pointer; background: {{p.hex}}; border: 2px solid #FFFFFF; box-shadow: 0 0 0 2px {{p.ring}}"></button>
+              </sc-for>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 10px">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="seed-picker" style="font-size: 12px; font-weight: 500; color: #5B616E">Pipette</label>
+                <input id="seed-picker" type="color" value="{{seedLower}}" onChange="{{onPick}}" style="width: 48px; height: 44px; padding: 2px; border: 1px solid #D5D8DF; border-radius: 10px; background: #FFFFFF; cursor: pointer">
+              </div>
+              <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+                <label for="seed-hex" style="font-size: 12px; font-weight: 500; color: #5B616E">Couleur de base (hex)</label>
+                <input id="seed-hex" type="text" value="{{draft}}" onChange="{{onHex}}" spellcheck="false" style="min-height: 44px; box-sizing: border-box; width: 100%; padding: 0 12px; border: 1px solid #D5D8DF; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #111318; background: #FFFFFF">
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMood}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <sc-for list="{{inspirations}}" as="i" hint-placeholder-count="6">
+              <button type="button" onClick="{{i.pick}}" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px; text-align: left; border-radius: 12px; border: 1px solid {{i.bd}}; background: {{i.bg}}; cursor: pointer; color: #111318">
+                <span aria-hidden="true" style="display: flex; flex-shrink: 0"><span style="width: 18px; height: 32px; border-radius: 6px 0 0 6px; background: {{i.hex}}"></span><span style="width: 18px; height: 32px; border-radius: 0 6px 6px 0; background: {{i.acc}}"></span></span>
+                <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{i.name}}</span><span style="font-size: 12px; color: #5B616E">{{i.moodLabel}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isLogo}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <label for="logo-file" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 150px; padding: 20px; text-align: center; border: 1.5px dashed #C4C8D1; border-radius: 14px; background: #F8F9FA; cursor: pointer; color: #3A3F4B">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-5-5L5 21"></path></svg>
+              <span style="font-weight: 600">Choisis ton logo</span>
+              <span style="font-size: 12px; color: #5B616E">PNG, JPG ou SVG — Chroma en extrait la couleur dominante.</span>
+            </label>
+            <input id="logo-file" type="file" accept="image/*" onChange="{{onLogo}}" style="font-size: 12px; color: #5B616E">
+            <sc-if value="{{hasLogoStatus}}" hint-placeholder-val="{{ false }}">
+              <p role="status" style="margin: 0; font-size: 13px; color: #3A3F4B">{{logoStatus}}</p>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Ambiance</h2>
+        <div role="group" aria-label="Ambiance" style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{moods}}" as="m" hint-placeholder-count="5">
+            <button type="button" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid {{m.bd}}; background: {{m.bg}}; color: {{m.fg}}; cursor: pointer; font-weight: 500">{{m.label}}</button>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #5B616E">{{moodDesc}}</p>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 18px">
+        <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Ajuster en direct</h2>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; justify-content: space-between"><label for="r-hue" style="font-weight: 500">Teinte</label><span style="font-family: 'JetBrains Mono', monospace; color: #5B616E">{{hueLabel}}</span></div>
+          <input id="r-hue" type="range" min="-180" max="180" step="1" value="{{hue}}" onChange="{{onHue}}" style="width: 100%">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; justify-content: space-between"><label for="r-sat" style="font-weight: 500">Saturation</label><span style="font-family: 'JetBrains Mono', monospace; color: #5B616E">{{sat}} %</span></div>
+          <input id="r-sat" type="range" min="0" max="150" step="1" value="{{sat}}" onChange="{{onSat}}" style="width: 100%">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; justify-content: space-between"><label for="r-rad" style="font-weight: 500">Arrondis</label><span style="font-family: 'JetBrains Mono', monospace; color: #5B616E">{{radius}} px</span></div>
+          <input id="r-rad" type="range" min="0" max="28" step="1" value="{{radius}}" onChange="{{onRadius}}" style="width: 100%">
+        </div>
+        <button type="button" onClick="{{reset}}" style="min-height: 44px; border-radius: 10px; border: 1px solid #D5D8DF; background: #FFFFFF; color: #111318; cursor: pointer; font-weight: 500">Réinitialiser les réglages</button>
+      </div>
+    </section>
+
+    <!-- Colonne centrale : aperçu -->
+    <section id="apercu" aria-label="Aperçu" style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Aperçu sur une vraie interface</h2>
+          <span style="font-size: 13px; color: #5B616E">{{previewCaption}}</span>
+        </div>
+        <div role="group" aria-label="Type de page" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; background: #F3F4F6; border: 1px solid #E3E5EA; border-radius: 10px">
+          <sc-for list="{{previews}}" as="p" hint-placeholder-count="3">
+            <button type="button" aria-pressed="{{p.pressed}}" onClick="{{p.pick}}" style="min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 500; background: {{p.bg}}; color: {{p.fg}}; box-shadow: {{p.shadow}}">{{p.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid #D5D8DF; border-radius: 14px; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #ECEEF1; border-bottom: 1px solid #D5D8DF">
+          <span aria-hidden="true" style="display: flex; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #C4C8D1"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #C4C8D1"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #C4C8D1"></span></span>
+          <span style="flex: 1 1 auto; max-width: 360px; margin: 0 auto; padding: 5px 12px; border-radius: 6px; background: #FFFFFF; color: #5B616E; font-size: 12px; text-align: center; font-family: 'JetBrains Mono', monospace">{{previewUrl}}</span>
+        </div>
+
+        <div style="background: {{t.bg}}; color: {{t.text}}; font-family: {{t.body}}; min-height: 600px">
+
+          <sc-if value="{{isLanding}}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 32px; border-bottom: 1px solid {{t.border}}">
+                <div style="display: flex; align-items: center; gap: 10px; font-family: {{t.head}}; font-weight: 700; font-size: 18px"><span aria-hidden="true" style="width: 22px; height: 22px; border-radius: {{t.radiusSm}}; background: {{t.primary}}"></span>Atelier Nord</div>
+                <div style="display: flex; gap: 22px; font-size: 14px; color: {{t.muted}}"><span>Produit</span><span>Tarifs</span><span>Ressources</span></div>
+                <button type="button" style="min-height: 38px; padding: 0 16px; border: 0; border-radius: {{t.radius}}; background: {{t.primary}}; color: {{t.onPrimary}}; font-weight: 600; font-size: 14px">Commencer</button>
+              </div>
+              <div style="padding: 56px 32px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px; align-items: center">
+                <div style="display: flex; flex-direction: column; gap: 20px; align-items: flex-start">
+                  <span style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: {{t.accentSoft}}; color: {{t.text}}; font-size: 13px; font-weight: 500"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{t.accent}}"></span>Nouveau · Version 2.0</span>
+                  <h3 style="margin: 0; font-family: {{t.head}}; font-size: 42px; line-height: 1.06; letter-spacing: -0.02em; font-weight: 700">Des outils simples pour les équipes qui avancent vite.</h3>
+                  <p style="margin: 0; font-size: 17px; line-height: 1.55; color: {{t.muted}}; max-width: 44ch">Planifie, partage et livre tes projets au même endroit, sans tableur ni chaîne d'e-mails.</p>
+                  <div style="display: flex; flex-wrap: wrap; gap: 12px">
+                    <button type="button" style="min-height: 46px; padding: 0 22px; border: 0; border-radius: {{t.radius}}; background: {{t.primary}}; color: {{t.onPrimary}}; font-weight: 600; font-size: 15px">Essayer gratuitement</button>
+                    <button type="button" style="min-height: 46px; padding: 0 22px; border: 1px solid {{t.border}}; border-radius: {{t.radius}}; background: transparent; color: {{t.text}}; font-weight: 600; font-size: 15px">Voir la démo</button>
+                  </div>
+                </div>
+                <div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+                  <div style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: {{t.head}}; font-weight: 600">Sprint de la semaine</span><span style="font-size: 12px; color: {{t.muted}}">4 tâches</span></div>
+                  <sc-for list="{{tasks}}" as="k" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: {{t.bg}}; border: 1px solid {{t.border}}; border-radius: {{t.radius}}">
+                      <span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 2px solid {{t.primary}}; background: {{k.fill}}"></span>
+                      <span style="flex: 1 1 auto; font-size: 14px">{{k.label}}</span>
+                      <span style="padding: 3px 8px; border-radius: 999px; font-size: 12px; background: {{t.accentSoft}}; color: {{t.text}}">{{k.tag}}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="padding: 8px 32px 44px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px">
+                <sc-for list="{{features}}" as="f" hint-placeholder-count="3">
+                  <div style="padding: 20px; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}; display: flex; flex-direction: column; gap: 10px">
+                    <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: {{t.radius}}; background: {{t.primarySoft}}; display: flex; align-items: center; justify-content: center"><span style="width: 12px; height: 12px; border-radius: 3px; background: {{t.primary}}"></span></span>
+                    <span style="font-family: {{t.head}}; font-weight: 600; font-size: 16px">{{f.title}}</span>
+                    <span style="font-size: 14px; line-height: 1.5; color: {{t.muted}}">{{f.text}}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isShop}}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 32px; border-bottom: 1px solid {{t.border}}">
+                <span style="font-family: {{t.head}}; font-weight: 700; font-size: 20px; letter-spacing: -0.01em">Maison Argile</span>
+                <span style="flex: 1 1 200px; max-width: 320px; padding: 10px 14px; border-radius: 999px; background: {{t.surface}}; border: 1px solid {{t.border}}; color: {{t.muted}}; font-size: 14px">Rechercher un objet…</span>
+                <button type="button" style="min-height: 40px; padding: 0 16px; border-radius: {{t.radius}}; border: 1px solid {{t.border}}; background: transparent; color: {{t.text}}; font-weight: 600; font-size: 14px">Panier (2)</button>
+              </div>
+              <div style="padding: 32px 32px 12px; display: flex; flex-direction: column; gap: 16px">
+                <h3 style="margin: 0; font-family: {{t.head}}; font-size: 32px; letter-spacing: -0.02em; font-weight: 700">Nouveautés d'automne</h3>
+                <p style="margin: 0; color: {{t.muted}}; font-size: 15px">Céramiques, linge et luminaires façonnés en petites séries.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                  <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+                    <button type="button" style="min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 500; border: 1px solid {{f.bd}}; background: {{f.bg}}; color: {{f.fg}}">{{f.label}}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="padding: 16px 32px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 20px">
+                <sc-for list="{{products}}" as="p" hint-placeholder-count="3">
+                  <div style="display: flex; flex-direction: column; gap: 12px; padding: 12px; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}">
+                    <div aria-hidden="true" style="position: relative; height: 170px; border-radius: {{t.radius}}; background: {{t.bg}}; display: flex; align-items: center; justify-content: center; overflow: hidden">
+                      <span style="width: {{p.w}}; height: {{p.h}}; border-radius: {{p.r}}; background: {{p.c1}}"></span>
+                      <span style="position: absolute; bottom: 22px; width: 60%; height: 10px; border-radius: 50%; background: {{t.border}}"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+                      <span style="font-weight: 600; font-size: 15px">{{p.name}}</span>
+                      <span style="font-family: {{t.head}}; font-weight: 700; font-size: 15px">{{p.price}}</span>
+                    </div>
+                    <span style="font-size: 13px; color: {{t.muted}}">{{p.cat}}</span>
+                    <button type="button" style="min-height: 42px; border: 0; border-radius: {{t.radius}}; background: {{t.primary}}; color: {{t.onPrimary}}; font-weight: 600; font-size: 14px">Ajouter au panier</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isDash}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; min-height: 600px">
+              <div style="flex: 1 1 170px; max-width: 210px; padding: 20px 14px; background: {{t.surface}}; border-right: 1px solid {{t.border}}; display: flex; flex-direction: column; gap: 6px; box-sizing: border-box">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 0 8px 16px; font-family: {{t.head}}; font-weight: 700; font-size: 16px"><span aria-hidden="true" style="width: 20px; height: 20px; border-radius: {{t.radiusSm}}; background: {{t.accent}}"></span>Pilotage</div>
+                <sc-for list="{{navItems}}" as="n" hint-placeholder-count="5">
+                  <span style="padding: 10px 12px; border-radius: {{t.radius}}; font-size: 14px; font-weight: 500; background: {{n.bg}}; color: {{n.fg}}">{{n.label}}</span>
+                </sc-for>
+              </div>
+              <div style="flex: 999 1 380px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px">
+                  <h3 style="margin: 0; font-family: {{t.head}}; font-size: 24px; font-weight: 700; letter-spacing: -0.01em">Vue d'ensemble</h3>
+                  <button type="button" style="min-height: 38px; padding: 0 14px; border-radius: {{t.radius}}; border: 1px solid {{t.border}}; background: {{t.surface}}; color: {{t.text}}; font-size: 13px; font-weight: 500">30 derniers jours</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+                  <sc-for list="{{kpis}}" as="k" hint-placeholder-count="3">
+                    <div style="padding: 16px; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}; display: flex; flex-direction: column; gap: 6px">
+                      <span style="font-size: 13px; color: {{t.muted}}">{{k.label}}</span>
+                      <span style="font-family: {{t.head}}; font-size: 26px; font-weight: 700; letter-spacing: -0.01em">{{k.value}}</span>
+                      <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{t.muted}}"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: {{t.accent}}"></span>{{k.delta}}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="padding: 18px; background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}; display: flex; flex-direction: column; gap: 14px">
+                  <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px"><span style="font-weight: 600">Ventes hebdomadaires</span><span style="display: flex; gap: 14px; font-size: 12px; color: {{t.muted}}"><span style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 2px; background: {{t.primary}}"></span>Semaines passées</span><span style="display: flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 2px; background: {{t.accent}}"></span>Cette semaine</span></span></div>
+                  <div role="img" aria-label="Histogramme des ventes sur 12 semaines" style="display: flex; align-items: flex-end; gap: 8px; height: 150px; border-bottom: 1px solid {{t.border}}">
+                    <sc-for list="{{bars}}" as="b" hint-placeholder-count="12">
+                      <span style="flex: 1 1 0; height: {{b.h}}; background: {{b.c}}; border-radius: {{t.radiusSm}} {{t.radiusSm}} 0 0"></span>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="background: {{t.surface}}; border: 1px solid {{t.border}}; border-radius: {{t.radiusLg}}; overflow-x: auto">
+                  <sc-for list="{{orders}}" as="o" hint-placeholder-count="3">
+                    <div style="display: grid; grid-template-columns: minmax(80px, 1fr) minmax(120px, 2fr) minmax(90px, 1fr) minmax(70px, auto); gap: 12px; align-items: center; padding: 12px 16px; border-top: 1px solid {{o.line}}; font-size: 13px; min-width: 420px">
+                      <span style="font-family: 'JetBrains Mono', monospace; color: {{t.muted}}">{{o.id}}</span>
+                      <span style="font-weight: 500">{{o.client}}</span>
+                      <span style="justify-self: start; padding: 3px 10px; border-radius: 999px; font-size: 12px; background: {{o.bg}}; color: {{o.fg}}">{{o.status}}</span>
+                      <span style="text-align: right; font-weight: 600">{{o.total}}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Colonne droite : rôles + contrastes -->
+    <section aria-label="Rôles et contrastes" style="flex: 1 1 290px; max-width: 360px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Rôles des couleurs</h2><span style="font-size: 12px; color: #5B616E">{{modeLabel}}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <sc-for list="{{roles}}" as="r" hint-placeholder-count="8">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 6px 0">
+              <span aria-hidden="true" style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: {{r.hex}}; box-shadow: inset 0 0 0 1px rgba(17,19,24,0.12)"></span>
+              <span style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 600">{{r.label}}</span><span style="font-size: 12px; color: #5B616E">{{r.desc}}</span></span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #3A3F4B">{{r.hex}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px"><h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Contrastes WCAG</h2><span style="font-size: 12px; color: #5B616E">{{passSummary}}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{checks}}" as="c" hint-placeholder-count="5">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <span aria-hidden="true" style="width: 44px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 700; font-size: 15px; background: {{c.bg}}; color: {{c.fg}}; box-shadow: inset 0 0 0 1px rgba(17,19,24,0.10)">Aa</span>
+              <span style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-weight: 500; font-size: 13px">{{c.name}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5B616E">{{c.ratio}} · min. {{c.minLabel}}</span></span>
+              <span style="flex-shrink: 0; padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: {{c.badgeBg}}; color: {{c.badgeFg}}">{{c.grade}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #5B616E">Chroma ajuste la luminosité du primaire et de l'accent pour tenir ces seuils, quelle que soit la couleur de départ.</p>
+      </div>
+    </section>
+
+    <!-- Export -->
+    <section id="export" aria-label="Exporter" style="flex: 1 1 100%; min-width: 0; background: #FFFFFF; border: 1px solid #E3E5EA; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600">Exporter le thème</h2>
+          <span style="font-size: 13px; color: #5B616E">Modes clair et sombre inclus, prêts à coller dans ton projet.</span>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+          <div role="group" aria-label="Format d'export" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; background: #F3F4F6; border: 1px solid #E3E5EA; border-radius: 10px">
+            <sc-for list="{{exports}}" as="x" hint-placeholder-count="3">
+              <button type="button" aria-pressed="{{x.pressed}}" onClick="{{x.pick}}" style="min-height: 36px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 500; background: {{x.bg}}; color: {{x.fg}}; box-shadow: {{x.shadow}}">{{x.label}}</button>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{copy}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 10px; border: 0; background: #111318; color: #FFFFFF; cursor: pointer; font-weight: 600">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+            {{copyLabel}}
+          </button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5B616E; font-family: 'JetBrains Mono', monospace">{{exportFile}}</div>
+      <pre style="margin: 0; padding: 20px; max-height: 440px; overflow: auto; border-radius: 12px; background: #111318; color: #E6E8EE; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; white-space: pre">{{exportCode}}</pre>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startColor":{"editor":"color","default":"#4F46E5","options":["#4F46E5","#C2410C","#059669","#DB2777"]},"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  defaults() {
+    const seed = (this.props.startColor || '#4F46E5').toUpperCase();
+    return { seed: seed, draft: seed, mood: 'calme', hue: 0, sat: 100, radius: 14, mode: 'light', source: 'color', preview: 'landing', exp: 'css', copied: false, logoStatus: '' };
+  }
+  moods() {
+    return {
+      calme: { label: 'Calme', desc: 'Couleurs adoucies, accent voisin, formes rondes. Idéal pour le bien-être, l’éducation, les services.', sat: 0.7, tint: 1, off: 35, fixed: null, accSat: 0.85, radius: 14, head: "'Space Grotesk', sans-serif", body: "'Inter', sans-serif" },
+      vif: { label: 'Vif', desc: 'Saturation poussée et accent complémentaire. Pour les marques jeunes, l’événementiel, le divertissement.', sat: 1.2, tint: 1.3, off: 170, fixed: null, accSat: 1.1, radius: 10, head: "'Space Grotesk', sans-serif", body: "'Inter', sans-serif" },
+      luxe: { label: 'Luxe', desc: 'Neutres profonds, saturation retenue, accent doré et angles nets. Pour la mode, l’hôtellerie, l’artisanat haut de gamme.', sat: 0.45, tint: 0.5, off: 0, fixed: 40, accSat: 1.4, radius: 2, head: "'Fraunces', Georgia, serif", body: "'Inter', sans-serif" },
+      tech: { label: 'Tech', desc: 'Contraste franc, accent froid, titres en monospace. Pour les SaaS, les outils de dev, les dashboards.', sat: 1, tint: 0.8, off: -150, fixed: null, accSat: 1, radius: 6, head: "'JetBrains Mono', monospace", body: "'Inter', sans-serif" },
+      naturel: { label: 'Naturel', desc: 'Tons terreux, accent analogue, courbes généreuses. Pour l’alimentation, le jardin, la slow-fashion.', sat: 0.55, tint: 1.1, off: -45, fixed: null, accSat: 0.8, radius: 20, head: "'Fraunces', Georgia, serif", body: "'Inter', sans-serif" }
+    };
+  }
+  hexToRgb(h) {
+    h = String(h).replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join('');
+    const n = parseInt(h, 16) || 0;
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(function (v) { return Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0'); }).join('').toUpperCase();
+  }
+  rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (mx + mn) / 2;
+    if (mx !== mn) {
+      const d = mx - mn;
+      s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+      if (mx === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (mx === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+    }
+    return [h, s, l];
+  }
+  hsl(h, s, l) {
+    h = ((h % 360) + 360) % 360; s = Math.max(0, Math.min(1, s)); l = Math.max(0, Math.min(1, l));
+    const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+    let r = 0, g = 0, b = 0;
+    if (h < 60) { r = c; g = x; } else if (h < 120) { r = x; g = c; } else if (h < 180) { g = c; b = x; }
+    else if (h < 240) { g = x; b = c; } else if (h < 300) { r = x; b = c; } else { r = c; b = x; }
+    return this.rgbToHex((r + m) * 255, (g + m) * 255, (b + m) * 255);
+  }
+  lum(hex) {
+    const v = this.hexToRgb(hex).map(function (c) { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); });
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  }
+  ratio(a, b) {
+    const A = this.lum(a), B = this.lum(b);
+    return (Math.max(A, B) + 0.05) / (Math.min(A, B) + 0.05);
+  }
+  fit(h, s, l, against, target, dir) {
+    let hex = this.hsl(h, s, l), i = 0;
+    while (this.ratio(hex, against) < target && i < 100) {
+      l += dir * 0.01;
+      if (l < 0 || l > 1) break;
+      hex = this.hsl(h, s, l); i++;
+    }
+    return [hex, l];
+  }
+  mix(a, b, t) {
+    const A = this.hexToRgb(a), B = this.hexToRgb(b);
+    return this.rgbToHex(A[0] * t + B[0] * (1 - t), A[1] * t + B[1] * (1 - t), A[2] * t + B[2] * (1 - t));
+  }
+  build(st, dark) {
+    const M = this.moods()[st.mood];
+    const rgb = this.hexToRgb(st.seed);
+    const base = this.rgbToHsl(rgb[0], rgb[1], rgb[2]);
+    const h = base[0] + st.hue;
+    const s = Math.min(1, base[1] * M.sat * st.sat / 100);
+    const l = base[2];
+    const ns = Math.min(0.35, s * 0.35) * M.tint;
+    const accH = M.fixed !== null ? M.fixed : h + M.off;
+    const accS = Math.min(1, Math.max(0.3, s * M.accSat)) * Math.min(1, st.sat / 100 + 0.2);
+    let bg, surface, border, text, muted, primary, onPrimary, accent;
+    if (!dark) {
+      bg = this.hsl(h, ns * 0.6, 0.985);
+      surface = this.hsl(h, ns * 0.7, 0.955);
+      border = this.hsl(h, ns * 0.6, 0.875);
+      text = this.hsl(h, ns * 0.9, 0.13);
+      muted = this.hsl(h, ns * 0.5, 0.40);
+      const inkOn = this.hsl(h, ns * 0.9, 0.12);
+      const a = this.fit(h, s, Math.min(l, 0.55), '#FFFFFF', 4.6, -1);
+      const b = this.fit(h, s, Math.max(Math.min(l, 0.8), 0.5), inkOn, 4.6, 1);
+      if (l > 0.58 && Math.abs(b[1] - l) < Math.abs(a[1] - l)) { primary = b[0]; onPrimary = inkOn; }
+      else { primary = a[0]; onPrimary = '#FFFFFF'; }
+      accent = this.fit(accH, accS, 0.52, bg, 3.1, -1)[0];
+    } else {
+      bg = this.hsl(h, ns * 0.8, 0.08);
+      surface = this.hsl(h, ns * 0.8, 0.12);
+      border = this.hsl(h, ns * 0.6, 0.23);
+      text = this.hsl(h, ns * 0.4, 0.95);
+      muted = this.hsl(h, ns * 0.4, 0.70);
+      onPrimary = this.hsl(h, ns * 0.8, 0.08);
+      primary = this.fit(h, s, Math.max(l, 0.6), onPrimary, 4.6, 1)[0];
+      accent = this.fit(accH, accS, 0.62, bg, 3.1, 1)[0];
+    }
+    const r = st.radius;
+    return {
+      bg: bg, surface: surface, border: border, text: text, muted: muted, primary: primary, onPrimary: onPrimary, accent: accent,
+      primarySoft: this.mix(primary, bg, dark ? 0.22 : 0.12), accentSoft: this.mix(accent, bg, dark ? 0.26 : 0.18),
+      radius: r + 'px', radiusSm: Math.max(2, Math.round(r * 0.45)) + 'px', radiusLg: Math.round(r * 1.35) + 'px',
+      head: M.head, body: M.body, dark: dark
+    };
+  }
+  renderVals() {
+    const st = Object.assign({}, this.defaults(), this.state || {});
+    const self = this;
+    const set = function (o) { self.setState(o); };
+    const M = this.moods();
+    const light = this.build(st, false), dark = this.build(st, true);
+    const t = st.mode === 'dark' ? dark : light;
+    const on = { bg: '#111318', fg: '#FFFFFF', bd: '#111318' };
+    const off = { bg: '#FFFFFF', fg: '#3A3F4B', bd: '#E3E5EA' };
+    const tab = function (sel) { return sel ? { bg: '#FFFFFF', fg: '#111318', shadow: '0 1px 2px rgba(17,19,24,0.12)' } : { bg: 'transparent', fg: '#5B616E', shadow: 'none' }; };
+
+    const modes = [{ id: 'light', label: 'Clair' }, { id: 'dark', label: 'Sombre' }].map(function (m) {
+      return Object.assign({}, m, tab(st.mode === m.id), { pressed: st.mode === m.id ? 'true' : 'false', pick: function () { set({ mode: m.id }); } });
+    });
+    const sources = [{ id: 'color', label: 'Couleur' }, { id: 'mood', label: 'Ambiance' }, { id: 'logo', label: 'Logo' }].map(function (s) {
+      return Object.assign({}, s, st.source === s.id ? on : off, { pressed: st.source === s.id ? 'true' : 'false', pick: function () { set({ source: s.id }); } });
+    });
+    const presetList = [
+      ['Indigo', '#4F46E5'], ['Terre cuite', '#C2410C'], ['Émeraude', '#059669'], ['Framboise', '#DB2777'],
+      ['Océan', '#0369A1'], ['Moutarde', '#CA8A04'], ['Violet', '#7C3AED'], ['Ardoise', '#475569']
+    ];
+    const presets = presetList.map(function (p) {
+      return { name: p[0], hex: p[1], ring: st.seed === p[1] ? '#111318' : '#E3E5EA', pick: function () { set({ seed: p[1], draft: p[1] }); } };
+    });
+    const insp = [
+      ['Café du matin', '#8B5E3C', 'calme'], ['Néon nocturne', '#D946EF', 'vif'], ['Boutique de luxe', '#3F3A36', 'luxe'],
+      ['Startup SaaS', '#2563EB', 'tech'], ['Jardin botanique', '#4D7C0F', 'naturel'], ['Bord de mer', '#0E7490', 'calme']
+    ];
+    const inspirations = insp.map(function (i) {
+      const active = st.seed === i[1] && st.mood === i[2];
+      const tmp = self.build(Object.assign({}, st, { seed: i[1], mood: i[2], hue: 0, sat: 100 }), false);
+      return { name: i[0], hex: tmp.primary, acc: tmp.accent, moodLabel: 'Ambiance ' + M[i[2]].label.toLowerCase(), bg: active ? '#F3F4F6' : '#FFFFFF', bd: active ? '#111318' : '#E3E5EA',
+        pick: function () { set({ seed: i[1], draft: i[1], mood: i[2], radius: M[i[2]].radius, hue: 0, sat: 100 }); } };
+    });
+    const moods = Object.keys(M).map(function (k) {
+      return Object.assign({ label: M[k].label }, st.mood === k ? on : off, { pressed: st.mood === k ? 'true' : 'false', pick: function () { set({ mood: k, radius: M[k].radius }); } });
+    });
+    const previews = [{ id: 'landing', label: 'Landing page' }, { id: 'shop', label: 'Boutique' }, { id: 'dash', label: 'Dashboard' }].map(function (p) {
+      return Object.assign({}, p, tab(st.preview === p.id), { pressed: st.preview === p.id ? 'true' : 'false', pick: function () { set({ preview: p.id }); } });
+    });
+
+    const tasks = [['Valider la maquette d’accueil', 'Design', true], ['Brancher le paiement', 'Dev', true], ['Rédiger la FAQ', 'Contenu', false], ['Tester sur mobile', 'QA', false]].map(function (k) {
+      return { label: k[0], tag: k[1], fill: k[2] ? t.primary : 'transparent' };
+    });
+    const features = [
+      { title: 'Tableaux partagés', text: 'Toute l’équipe voit l’avancement en temps réel.' },
+      { title: 'Rappels intelligents', text: 'Les échéances arrivent au bon moment, pas avant.' },
+      { title: 'Intégrations', text: 'Connecte ton agenda, ta messagerie et ton drive.' }
+    ];
+    const filters = ['Tout', 'Céramique', 'Linge', 'Luminaires'].map(function (f, i) {
+      return i === 0 ? { label: f, bg: t.primary, fg: t.onPrimary, bd: t.primary } : { label: f, bg: 'transparent', fg: t.text, bd: t.border };
+    });
+    const products = [
+      { name: 'Tasse en grès', cat: 'Céramique · émail mat', price: '24 €', w: '84px', h: '96px', r: '14px 14px 30px 30px', c1: t.primary },
+      { name: 'Plaid en lin', cat: 'Linge · 130 × 170 cm', price: '89 €', w: '120px', h: '86px', r: t.radius, c1: t.accent },
+      { name: 'Lampe Galet', cat: 'Luminaire · laiton', price: '145 €', w: '96px', h: '96px', r: '50%', c1: t.primarySoft }
+    ];
+    const navItems = ['Vue d’ensemble', 'Commandes', 'Clients', 'Produits', 'Réglages'].map(function (n, i) {
+      return i === 0 ? { label: n, bg: t.primary, fg: t.onPrimary } : { label: n, bg: 'transparent', fg: t.muted };
+    });
+    const kpis = [
+      { label: 'Chiffre d’affaires', value: '12 480 €', delta: '+12 % vs. septembre' },
+      { label: 'Commandes', value: '342', delta: '+8 % vs. septembre' },
+      { label: 'Taux de conversion', value: '3,8 %', delta: '+0,4 pt vs. septembre' }
+    ];
+    const bars = [42, 55, 48, 63, 58, 70, 52, 66, 74, 61, 80, 92].map(function (v, i, a) {
+      return { h: v + '%', c: i === a.length - 1 ? t.accent : t.primary };
+    });
+    const ok = { bg: t.primarySoft, fg: t.text };
+    const pend = { bg: t.accentSoft, fg: t.text };
+    const orders = [
+      { id: '#4821', client: 'Camille Laurent', status: 'Livrée', total: '86,00 €', s: ok },
+      { id: '#4820', client: 'Hugo Martin', status: 'En cours', total: '142,50 €', s: pend },
+      { id: '#4819', client: 'Inès Bernard', status: 'Livrée', total: '39,90 €', s: ok }
+    ].map(function (o, i) { return Object.assign({}, o, { bg: o.s.bg, fg: o.s.fg, line: i === 0 ? 'transparent' : t.border }); });
+
+    const roles = [
+      { label: 'Arrière-plan', desc: 'Fond des pages', hex: t.bg },
+      { label: 'Surface', desc: 'Cartes, panneaux', hex: t.surface },
+      { label: 'Bordure', desc: 'Séparateurs, contours', hex: t.border },
+      { label: 'Texte', desc: 'Titres et paragraphes', hex: t.text },
+      { label: 'Texte secondaire', desc: 'Légendes, métadonnées', hex: t.muted },
+      { label: 'Primaire', desc: 'Boutons, liens, actif', hex: t.primary },
+      { label: 'Texte sur primaire', desc: 'Libellés des boutons', hex: t.onPrimary },
+      { label: 'Accent', desc: 'Badges, graphiques, détails', hex: t.accent }
+    ];
+    const checks = [
+      { name: 'Texte / arrière-plan', fg: t.text, bg: t.bg, min: 4.5 },
+      { name: 'Texte secondaire / fond', fg: t.muted, bg: t.bg, min: 4.5 },
+      { name: 'Texte / surface', fg: t.text, bg: t.surface, min: 4.5 },
+      { name: 'Bouton primaire', fg: t.onPrimary, bg: t.primary, min: 4.5 },
+      { name: 'Accent (graphique) / fond', fg: t.accent, bg: t.bg, min: 3 }
+    ].map(function (c) {
+      const r = self.ratio(c.fg, c.bg);
+      const pass = r >= c.min;
+      const grade = !pass ? 'Échec' : r >= 7 ? 'AAA' : r >= 4.5 ? 'AA' : 'AA graph.';
+      return Object.assign({}, c, { ratio: r.toFixed(2).replace('.', ',') + ':1', minLabel: String(c.min).replace('.', ',') + ':1', grade: grade, pass: pass,
+        badgeBg: pass ? '#DDF3E4' : '#FDE2E2', badgeFg: pass ? '#14532D' : '#7F1D1D' });
+    });
+    const passed = checks.filter(function (c) { return c.pass; }).length;
+
+    const pairs = function (th) {
+      return [['bg', th.bg], ['surface', th.surface], ['border', th.border], ['text', th.text], ['text-muted', th.muted], ['primary', th.primary], ['on-primary', th.onPrimary], ['accent', th.accent]];
+    };
+    const cssVars = function (th) { return pairs(th).map(function (p) { return '  --color-' + p[0] + ': ' + p[1] + ';'; }).join('\n'); };
+    const css = '/* Chroma — ambiance « ' + M[st.mood].label + ' », base ' + st.seed + ' */\n' +
+      ':root {\n' + cssVars(light) + '\n  --radius: ' + st.radius + 'px;\n}\n\n' +
+      '[data-theme="dark"] {\n' + cssVars(dark) + '\n}\n';
+    const tw = '/** tailwind.config.js — à combiner avec l’export CSS (variables) */\n' +
+      'module.exports = {\n' +
+      '  darkMode: [\'selector\', \'[data-theme="dark"]\'],\n' +
+      '  theme: {\n' +
+      '    extend: {\n' +
+      '      colors: {\n' +
+      '        background: \'var(--color-bg)\',\n' +
+      '        surface: \'var(--color-surface)\',\n' +
+      '        border: \'var(--color-border)\',\n' +
+      '        foreground: \'var(--color-text)\',\n' +
+      '        muted: \'var(--color-text-muted)\',\n' +
+      '        primary: {\n' +
+      '          DEFAULT: \'var(--color-primary)\',\n' +
+      '          foreground: \'var(--color-on-primary)\',\n' +
+      '        },\n' +
+      '        accent: \'var(--color-accent)\',\n' +
+      '      },\n' +
+      '      borderRadius: {\n' +
+      '        theme: \'var(--radius)\',\n' +
+      '      },\n' +
+      '    },\n' +
+      '  },\n' +
+      '};\n';
+    const tok = function (th) {
+      const o = {};
+      pairs(th).forEach(function (p) { o[p[0]] = { $type: 'color', $value: p[1] }; });
+      return o;
+    };
+    const figma = JSON.stringify({ chroma: { light: tok(light), dark: tok(dark), radius: { $type: 'dimension', $value: st.radius + 'px' } } }, null, 2) + '\n';
+    const codes = { css: css, tailwind: tw, figma: figma };
+    const files = { css: 'theme.css', tailwind: 'tailwind.config.js', figma: 'chroma.tokens.json — format W3C Design Tokens' };
+    const exportsList = [{ id: 'css', label: 'Variables CSS' }, { id: 'tailwind', label: 'Tailwind' }, { id: 'figma', label: 'Tokens Figma' }].map(function (x) {
+      return Object.assign({}, x, tab(st.exp === x.id), { pressed: st.exp === x.id ? 'true' : 'false', pick: function () { set({ exp: x.id, copied: false }); } });
+    });
+    const code = codes[st.exp];
+
+    const urls = { landing: 'ateliernord.fr', shop: 'maison-argile.fr/nouveautes', dash: 'app.pilotage.fr/vue-ensemble' };
+    const caps = { landing: 'Hero, navigation, cartes et boutons', shop: 'Fiches produit, filtres et panier', dash: 'Navigation, indicateurs, graphique et tableau' };
+
+    return {
+      t: t, modes: modes, sources: sources, presets: presets, inspirations: inspirations, moods: moods, previews: previews,
+      isColor: st.source === 'color', isMood: st.source === 'mood', isLogo: st.source === 'logo',
+      isLanding: st.preview === 'landing', isShop: st.preview === 'shop', isDash: st.preview === 'dash',
+      seedLower: st.seed.toLowerCase(), draft: st.draft,
+      hue: st.hue, sat: st.sat, radius: st.radius, hueLabel: (st.hue > 0 ? '+' : '') + st.hue + '°',
+      moodDesc: M[st.mood].desc, modeLabel: st.mode === 'dark' ? 'Mode sombre' : 'Mode clair',
+      previewUrl: urls[st.preview], previewCaption: caps[st.preview],
+      tasks: tasks, features: features, filters: filters, products: products, navItems: navItems, kpis: kpis, bars: bars, orders: orders,
+      roles: roles, checks: checks, passSummary: passed + '/' + checks.length + ' conformes',
+      exports: exportsList, exportCode: code, exportFile: files[st.exp], copyLabel: st.copied ? 'Copié !' : 'Copier',
+      hasLogoStatus: !!st.logoStatus, logoStatus: st.logoStatus,
+      onPick: function (e) { const v = String(e.target.value).toUpperCase(); set({ seed: v, draft: v }); },
+      onHex: function (e) {
+        let v = String(e.target.value).trim();
+        const patch = { draft: v };
+        if (/^#?[0-9a-fA-F]{6}$/.test(v)) { patch.seed = ('#' + v.replace('#', '')).toUpperCase(); }
+        set(patch);
+      },
+      onHue: function (e) { set({ hue: parseInt(e.target.value, 10) || 0 }); },
+      onSat: function (e) { set({ sat: parseInt(e.target.value, 10) || 0 }); },
+      onRadius: function (e) { set({ radius: parseInt(e.target.value, 10) || 0 }); },
+      reset: function () { set({ hue: 0, sat: 100, radius: M[st.mood].radius }); },
+      copy: function () {
+        try { if (navigator.clipboard) navigator.clipboard.writeText(code); } catch (err) {}
+        set({ copied: true });
+        setTimeout(function () { set({ copied: false }); }, 1800);
+      },
+      onLogo: function (e) {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        set({ logoStatus: 'Analyse de « ' + f.name + ' »…' });
+        const url = URL.createObjectURL(f);
+        const img = new Image();
+        img.onload = function () {
+          try {
+            const c = document.createElement('canvas');
+            c.width = 64; c.height = 64;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img, 0, 0, 64, 64);
+            const d = ctx.getImageData(0, 0, 64, 64).data;
+            const bins = {};
+            for (let i = 0; i < d.length; i += 4) {
+              if (d[i + 3] < 128) continue;
+              const hs = self.rgbToHsl(d[i], d[i + 1], d[i + 2]);
+              if (hs[1] < 0.2 || hs[2] < 0.12 || hs[2] > 0.92) continue;
+              const k = Math.round(hs[0] / 20);
+              const bn = bins[k] || (bins[k] = { n: 0, r: 0, g: 0, b: 0 });
+              bn.n += hs[1]; bn.r += d[i] * hs[1]; bn.g += d[i + 1] * hs[1]; bn.b += d[i + 2] * hs[1];
+            }
+            let best = null;
+            Object.keys(bins).forEach(function (k) { if (!best || bins[k].n > best.n) best = bins[k]; });
+            URL.revokeObjectURL(url);
+            if (!best) { set({ logoStatus: 'Aucune couleur vive trouvée dans ce logo. Essaie un autre fichier ou choisis une couleur.' }); return; }
+            const hex = self.rgbToHex(best.r / best.n, best.g / best.n, best.b / best.n);
+            set({ seed: hex, draft: hex, hue: 0, logoStatus: 'Couleur dominante extraite : ' + hex });
+          } catch (err) { set({ logoStatus: 'Impossible de lire ce fichier.' }); }
+        };
+        img.onerror = function () { set({ logoStatus: 'Format non reconnu. Utilise un PNG, JPG ou SVG.' }); };
+        img.src = url;
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
